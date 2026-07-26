@@ -29,4 +29,8 @@ public class User {
 
     @Column(name = "is_verified")
     private Boolean isVerified = false;
+
+    private String otp;
+
+    private Long otpGeneratedTime;
 }

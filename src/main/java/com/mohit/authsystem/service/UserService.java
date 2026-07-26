@@ -1,6 +1,7 @@
 package com.mohit.authsystem.service;
 import com.mohit.authsystem.entity.User;
 import com.mohit.authsystem.repository.UserRepository;
+import com.mohit.authsystem.util.OtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
     public User registerUser(User user){
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
 
@@ -25,7 +29,21 @@ public class UserService {
         // Encode Password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        return userRepository.save(user);
+        // Generate OTP
+        String otp = OtpUtil.generateOtp();
+
+        // Set OTP details
+        user.setOtp(otp);
+        user.setOtpGeneratedTime(System.currentTimeMillis());
+        user.setIsVerified(false);
+
+        // Save user
+        User savedUser = userRepository.save(user);
+
+        // Send OTP
+        emailService.sendOtpEmail(user.getEmail(), otp);
+
+        return savedUser;
     }
 
     public User loginUser(String email, String password){
