@@ -28,5 +28,5 @@ public class User {
     private String password;
 
     @Column(name = "is_verified")
-    private boolean isVerified;
+    private Boolean isVerified = false;
 }
