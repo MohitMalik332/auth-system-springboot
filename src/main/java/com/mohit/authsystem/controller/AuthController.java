@@ -25,5 +25,9 @@ public class AuthController {
         return userService.loginUser(user.getEmail(), user.getPassword());
     }
 
+    @PostMapping("/verify-otp")
+    public String veryfyOtp(@RequestBody User user){
+        return userService.verifyOtp(user.getEmail(), user.getOtp());
+    }
 
 }

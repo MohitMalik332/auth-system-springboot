@@ -58,6 +58,38 @@ public class UserService {
             throw new RuntimeException("Invalid Password");
         }
 
+        if (!userDetails.get().getIsVerified()){
+            throw new RuntimeException("User Not Verified.");
+        }
+
         return userDetails.get();
+    }
+
+    public String verifyOtp(String email, String otp){
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new RuntimeException("User Not Found.");
+        }
+
+        // Match OTP
+        if(!user.get().getOtp().equals(otp)){
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        // Check OTP time
+        long currentTime = System.currentTimeMillis();
+        long diff = currentTime - user.get().getOtpGeneratedTime();
+
+        if (diff > 5 * 60 * 1000){
+            throw new RuntimeException("OTP Expired");
+        }
+
+        user.get().setIsVerified(true);
+        user.get().setOtp(null);
+
+        userRepository.save(user.get());
+
+        return "User Verified Successfully";
     }
 }
