@@ -25,4 +25,13 @@ public class JwtUtil {
                 .signWith(key)
                 .compact();
     }
+
+    public String extractEmail(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }
